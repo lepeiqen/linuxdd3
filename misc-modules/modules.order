@@ -1,0 +1,10 @@
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/hello.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/hellop.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/sleepy.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/complete.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/jit.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/seq.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/silly.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/kdatasize.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/kdataalign.ko
+kernel//home/lpq/projectcc/linuxdd3/examples/misc-modules/jiq.ko
