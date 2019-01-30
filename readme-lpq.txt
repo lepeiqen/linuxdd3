@@ -3,6 +3,32 @@ header files:
 /lib/modules/4.15.0-42-generic/build/include/linux
 ubuntu 4.15.0-42 porting:
 
+1.Makefile:
+CFLAGS---> EXTRA_CFLAGS [old style]
+2.main.c
+//#include <linux/config.h>
+#include <asm/system.h> --->  #include <asm/switch_to.h>
+init_MUTEX(sem); ---> sema_init(sem, 1); 
+ioctl ---> unlocked_ioctl;
+3.pipe.c
+init_MUTEX(sem); ---> sema_init(sem, 1); 
+ioctl ---> unlocked_ioctl;
+add #include <linux/sched.h>
+4.access.c
+init_MUTEX(sem); ---> sema_init(sem, 1); 4 place;
+ioctl ---> unlocked_ioctl; 4 place;
+static spinlock_t scull_u_lock = SPIN_LOCK_UNLOCKED;-->static DEFINE_SPINLOCK(scull_u_lock);
+add #include <linux/sched.h>
+current->uid ---> current->cred->uid.val;
+********************************************************
+1.insmod ./scull.ko
+2.lsmod will see scull in the 1st line, and also "/sys/module/scull" is created.
+"cat /proc/devices" to check the major/minor
+3.mkdir  /dev/scull; mknod /dev/scull/scull0 c major 0
+then the char devices is there.
+ 4.chmod +x ./scull_load and run ./scull_load
+
+
 1. misc-modules:
 Makefile : del seq.o jit.o jiq.o silly.o faulty.o kdatasize.o kdataalign.o
 2>. jit.c :
