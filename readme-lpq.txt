@@ -36,7 +36,7 @@ Makefile : del seq.o jit.o jiq.o silly.o faulty.o kdatasize.o kdataalign.o
 	2>. proc_create_data, not create_proc_read_entry
 	3>. add header files : slab.h sched.h uaccess.h signal.h
 	4>. cat jitimer will crash the pc, so the later tasklet also not verified.--> TBD
-	5>. init_timer -> timer_setup/from_timer in timer.h  TBD
+	5>. init_timer is outdate; -> timer_setup/from_timer in timer.h  TBD
 3>. jiq.c : 
 	1>. INIT_WORK change : search 'work_struct' in workqueue.h 's changelist;
 	2>. refer 'linux/kernel/drivers/iio$ vi ./imu/st_lsm6ds3h/st_lsm6ds3h_trigger.c +243'

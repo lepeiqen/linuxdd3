@@ -182,7 +182,6 @@ ssize_t jit_timer(struct file *fd, char __user *buf, size_t size, loff_t *offset
 	if (!data)
 		return -ENOMEM;
 
-	//init_timer(&data->timer);
 	init_waitqueue_head (&data->wait);
 
 	/* write the first lines in the buffer */
@@ -197,9 +196,15 @@ ssize_t jit_timer(struct file *fd, char __user *buf, size_t size, loff_t *offset
 	data->loops = JIT_ASYNC_LOOPS;
 	
 	/* register the timer */
-	//data->timer.data = (unsigned long)data; //lpq del
-	//data->timer.function = jit_timer_fn;
-	timer_setup(&data->timer, jit_timer_fn, 0);
+	/* timer init < linux-4.15.0 */
+/*
+	init_timer(&data->timer);  //del as outdated, but should be init as well?
+	data->timer.data = (unsigned long)data;
+	data->timer.function = jit_timer_fn;
+*/
+	/* timer init >= linux-4.15.0 */
+	timer_setup(&data->timer, jit_timer_fn, 0);//lpq add
+
 	data->timer.expires = j + tdelay; /* parameter */
 	add_timer(&data->timer);
 
