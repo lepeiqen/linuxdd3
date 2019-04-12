@@ -31,6 +31,8 @@ then the char devices is there.
 
 1. misc-modules:
 Makefile : del seq.o jit.o jiq.o silly.o faulty.o kdatasize.o kdataalign.o
+after build, insmod jit.ko -> cat curtime,jitbusy OK, cat jitimer will crash;
+	both linux-4.15 before or after fail; guess enter irq handler is the root cause;
 2>. jit.c :
 	1>. linux/config.h del
 	2>. proc_create_data, not create_proc_read_entry
