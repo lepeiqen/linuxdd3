@@ -15,7 +15,8 @@
  * $Id: _main.c.in,v 1.21 2004/10/14 20:11:39 corbet Exp $
  */
 
-#include <linux/config.h>
+//#include <linux/config.h>//lpq del
+#include <linux/uaccess.h> // lpq add for copy_from_user
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
@@ -415,10 +416,10 @@ struct async_work {
 /*
  * "Complete" an asynchronous operation.
  */
-static void sculld_do_deferred_op(void *p)
+static void sculld_do_deferred_op(struct work_struct *pwork)
 {
-	struct async_work *stuff = (struct async_work *) p;
-	aio_complete(stuff->iocb, stuff->result, 0);
+	struct async_work *stuff = container_of(pwork, struct async_work, work);
+//	aio_complete(stuff->iocb, stuff->result, 0);//lpq del for compile err
 	kfree(stuff);
 }
 
@@ -445,8 +446,9 @@ static int sculld_defer_op(int write, struct kiocb *iocb, char __user *buf,
 		return result; /* No memory, just complete now */
 	stuff->iocb = iocb;
 	stuff->result = result;
-	INIT_WORK(&stuff->work, sculld_do_deferred_op, stuff);
-	schedule_delayed_work(&stuff->work, HZ/100);
+	INIT_WORK(&stuff->work, sculld_do_deferred_op);
+//	schedule_delayed_work(&stuff->work, HZ/100);//lpq need to define struct delayed_work
+	schedule_work(&stuff->work);
 	return -EIOCBQUEUED;
 }
 
@@ -480,12 +482,12 @@ struct file_operations sculld_fops = {
 	.llseek =    sculld_llseek,
 	.read =	     sculld_read,
 	.write =     sculld_write,
-	.ioctl =     sculld_ioctl,
+//	.ioctl =     sculld_ioctl,//lpq del
 	.mmap =	     sculld_mmap,
 	.open =	     sculld_open,
 	.release =   sculld_release,
-	.aio_read =  sculld_aio_read,
-	.aio_write = sculld_aio_write,
+//	.aio_read =  sculld_aio_read,//lpq del 2
+//	.aio_write = sculld_aio_write,
 };
 
 int sculld_trim(struct sculld_dev *dev)
@@ -532,7 +534,7 @@ static void sculld_setup_cdev(struct sculld_dev *dev, int index)
 		printk(KERN_NOTICE "Error %d adding scull%d", err, index);
 }
 
-static ssize_t sculld_show_dev(struct device *ddev, char *buf)
+static ssize_t sculld_show_dev(struct device *ddev, struct device_attribute *attr, char *buf)//lpq api change
 {
 	struct sculld_dev *dev = ddev->driver_data;
 
