@@ -3,8 +3,14 @@ header files:
 /lib/modules/4.15.0-42-generic/build/include/linux
 ubuntu 4.15.0-42 porting:
 
+#include <generated/autoconf.h> //lpq add
+#include <linux/sched.h> // lpq add for schedule
+#include <linux/slab.h> // lpq add for kmalloc
+#include <linux/uaccess.h> // lpq add for copy_from_user
+#include <linux/sched/signal.h> // lpq add for signal_pending
+
 1.Makefile:
-CFLAGS---> EXTRA_CFLAGS [old style]
+CFLAGS---> ccflags-y [old style]
 2.main.c
 //#include <linux/config.h>
 #include <asm/system.h> --->  #include <asm/switch_to.h>
