@@ -1,6 +1,6 @@
 
 header files:
-/lib/modules/4.15.0-42-generic/build/include/linux
+/lib/modules/4.15.0-47-generic/build/include/linux
 ubuntu 4.15.0-42 porting:
 
 #include <generated/autoconf.h> //lpq add

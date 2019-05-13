@@ -15,7 +15,7 @@
  * $Id: snull.c,v 1.21 2004/11/05 02:36:03 rubini Exp $
  */
 
-#include <linux/config.h>
+//#include <linux/config.h> //lpq del
 #include <linux/module.h>
 #include <linux/init.h>
 #include <linux/moduleparam.h>
@@ -286,7 +286,7 @@ void snull_rx(struct net_device *dev, struct snull_packet *pkt)
  */
 static int snull_poll(struct net_device *dev, int *budget)
 {
-	int npackets = 0, quota = min(dev->quota, *budget);
+	int npackets = 0, quota = *budget; //lpq rev
 	struct sk_buff *skb;
 	struct snull_priv *priv = netdev_priv(dev);
 	struct snull_packet *pkt;
@@ -316,9 +316,9 @@ static int snull_poll(struct net_device *dev, int *budget)
 	}
 	/* If we processed all packets, we're done; tell the kernel and reenable ints */
 	*budget -= npackets;
-	dev->quota -= npackets;
+//	dev->quota -= npackets;//lpq del
 	if (! priv->rx_queue) {
-		netif_rx_complete(dev);
+//		netif_rx_complete(dev);//lpq del
 		snull_rx_ints(dev, 1);
 		return 0;
 	}
@@ -403,7 +403,7 @@ static void snull_napi_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	priv->status = 0;
 	if (statusword & SNULL_RX_INTR) {
 		snull_rx_ints(dev, 0);  /* Disable further interrupts */
-		netif_rx_schedule(dev);
+//		netif_rx_schedule(dev);//lpq del
 	}
 	if (statusword & SNULL_TX_INTR) {
         	/* a transmission is over: free the skb */
@@ -520,7 +520,7 @@ int snull_tx(struct sk_buff *skb, struct net_device *dev)
 		len = ETH_ZLEN;
 		data = shortpkt;
 	}
-	dev->trans_start = jiffies; /* save the timestamp */
+//	dev->trans_start = jiffies; /* save the timestamp */
 
 	/* Remember the skb, so we can free it at interrupt time */
 	priv->skb = skb;
@@ -643,7 +643,8 @@ void snull_init(struct net_device *dev)
 	 * hand assignments
 	 */
 	ether_setup(dev); /* assign some of the fields */
-
+//lpq del
+/*
 	dev->open            = snull_open;
 	dev->stop            = snull_release;
 	dev->set_config      = snull_config;
@@ -654,15 +655,16 @@ void snull_init(struct net_device *dev)
 	dev->rebuild_header  = snull_rebuild_header;
 	dev->hard_header     = snull_header;
 	dev->tx_timeout      = snull_tx_timeout;
+*/
 	dev->watchdog_timeo = timeout;
 	if (use_napi) {
-		dev->poll        = snull_poll;
-		dev->weight      = 2;
+//		dev->poll        = snull_poll;
+//		dev->weight      = 2;
 	}
 	/* keep the default flags, just add NOARP */
 	dev->flags           |= IFF_NOARP;
-	dev->features        |= NETIF_F_NO_CSUM;
-	dev->hard_header_cache = NULL;      /* Disable caching */
+//	dev->features        |= NETIF_F_NO_CSUM;
+//	dev->hard_header_cache = NULL;      /* Disable caching */
 
 	/*
 	 * Then, initialize the priv field. This encloses the statistics
@@ -711,9 +713,9 @@ int snull_init_module(void)
 	snull_interrupt = use_napi ? snull_napi_interrupt : snull_regular_interrupt;
 
 	/* Allocate the devices */
-	snull_devs[0] = alloc_netdev(sizeof(struct snull_priv), "sn%d",
+	snull_devs[0] = alloc_netdev(sizeof(struct snull_priv), "sn%d", NET_NAME_UNKNOWN,
 			snull_init);
-	snull_devs[1] = alloc_netdev(sizeof(struct snull_priv), "sn%d",
+	snull_devs[1] = alloc_netdev(sizeof(struct snull_priv), "sn%d", NET_NAME_UNKNOWN,
 			snull_init);
 	if (snull_devs[0] == NULL || snull_devs[1] == NULL)
 		goto out;
